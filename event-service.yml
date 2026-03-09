@@ -1,0 +1,49 @@
+server:
+  port: ${PORT}
+      
+grpc:
+  server:
+    address: 0.0.0.0
+
+spring:
+  cloud:
+    discovery:
+      metadata:
+        gRPC_port: ${EVENT_SERVICE_GRPC_PORT}   
+        
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: postgresql
+
+  flyway:
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  data:
+    redis:
+      host: ${RD_HOST}
+      port: ${RD_PORT}
+      password: ${RD_PASSWORD}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KC_INTERNAL_BASE_URL}/realms/${KC_REALM}/protocol/openid-connect/certs
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT}
+
+event:
+  reservation:
+    ttl: ${RSV_TTL}
+
+

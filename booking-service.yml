@@ -1,0 +1,112 @@
+server:
+  port: ${PORT}
+
+grpc:
+  server:
+    address: 0.0.0.0
+  client:
+    event-service:
+      address: 'discovery:///event-service'
+      negotiation-type: plaintext
+      service-metadata-keys: gRPC_port
+      
+spring:
+  cloud:
+    discovery:
+      metadata:
+        gRPC_port: ${GRPC_PORT}
+        
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: postgresql
+
+  flyway:
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  data:
+    redis:
+      host: ${RD_HOST}
+      port: ${RD_PORT}
+      password: ${RD_PASSWORD}
+    
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KC_INTERNAL_BASE_URL}/realms/${KC_REALM}/protocol/openid-connect/certs
+
+
+  kafka:
+    bootstrap-servers: ${KF_SERVER_URL}
+    properties:
+      schema.registry.url: ${SC_REGISTRY_URL}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+    consumer:
+      group-id: ${KF_CONSUMER_GROUP_ID}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
+        specific.protobuf.value.type: ${KF_PROTOBUF_TYPE}
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT}
+
+resilience4j:
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        event-consumer-buffer-size: 10
+        record-exceptions:
+          - io.grpc.StatusRuntimeException
+          - java.util.concurrent.TimeoutException
+    instances:
+      eventService:
+        base-config: default
+        minimum-number-of-calls: ${CB_MINIMUM_CALLS:5}
+        failure-rate-threshold: ${CB_FAILURE_THRESHOLD:50}
+        wait-duration-in-open-state: ${CB_WAIT_DURATION:10s}
+        permitted-number-of-calls-in-half-open-state: ${CB_HALF_OPEN_CALLS:3}
+        sliding-window-size: ${CB_WINDOW_SIZE:10}
+        record-failure-predicate: com.eventapp.bookingservice.config.GrpcFailurePredicate
+
+  retry:
+    retry-aspect-order: 2
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - io.grpc.StatusRuntimeException
+          - java.util.concurrent.TimeoutException
+          - java.net.ConnectException
+    instances:
+      eventService:
+        base-config: default
+        retry-exception-predicate: com.eventapp.bookingservice.config.GrpcFailurePredicate    
+        
+app:
+  schema-registry:
+    url: ${SC_REGISTRY_URL}
+  inventory:
+    lock-min: ${LOCK_MIN}
+    shadow-buffer-min: ${SHADOW_BUFFER_MIN}
+    sentinel-min: ${SENTINEL_MIN}
+  security:
+    hmac-secret: ${HMAC_SECURITY}

@@ -1,0 +1,18 @@
+api:
+  base-path: /api/v1
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true

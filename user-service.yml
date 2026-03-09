@@ -1,0 +1,54 @@
+server:
+  port: ${PORT}
+
+spring:
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: postgresql
+
+  flyway:
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KC_INTERNAL_BASE_URL}/realms/${KC_REALM}/protocol/openid-connect/certs
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT}
+       
+resilience4j:
+  circuitbreaker:
+    circuitBreakerAspectOrder: 1
+    instances:
+      keycloakSync:
+        minimum-number-of-calls: ${CB_MINIMUM_CALLS:5}
+        failure-rate-threshold: ${CB_FAILURE_THRESHOLD:50}
+        wait-duration-in-open-state: ${CB_WAIT_DURATION:10s}
+        permitted-number-of-calls-in-half-open-state: ${CB_HALF_OPEN_CALLS:3}
+        sliding-window-size: ${CB_WINDOW_SIZE:10}
+  retry:
+    retryAspectOrder: 2
+    instances:
+      keycloakSync:
+        max-attempts: 4
+        wait-duration: 2s
+        enable-exponential-backoff: true      
+        retry-exceptions:
+          - com.eventapp.userservice.exceptions.domain.KeycloakUpdateException
+keycloak:
+  admin:
+    server-url: ${KC_INTERNAL_BASE_URL}
+    realm: ${KC_REALM}
+    client-id: ${KC_CLIENT_ID}
+    client-secret: ${KC_CLIENT_SECRET}
+
