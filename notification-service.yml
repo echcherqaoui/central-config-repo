@@ -3,6 +3,8 @@ server:
 
 spring:
   datasource:
+    hikari:
+      pool-name: HikariPool-notification
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}

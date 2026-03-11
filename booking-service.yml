@@ -17,6 +17,8 @@ spring:
         gRPC_port: ${GRPC_PORT}
         
   datasource:
+    hikari:
+      pool-name: HikariPool-booking
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}

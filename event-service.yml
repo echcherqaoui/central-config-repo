@@ -12,6 +12,8 @@ spring:
         gRPC_port: ${EVENT_SERVICE_GRPC_PORT}   
         
   datasource:
+    hikari:
+      pool-name: HikariPool-event
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}

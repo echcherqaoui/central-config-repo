@@ -9,6 +9,8 @@ grpc:
 
 spring:
   datasource:
+    hikari:
+      pool-name: HikariPool-payment
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
