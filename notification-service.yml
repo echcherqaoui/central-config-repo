@@ -40,10 +40,6 @@ spring:
         spring.deserializer.value.delegate.class: com.eventapp.notificationservice.kafka.deserializer.ProtobufDeserializer
         specific.protobuf.value.type: ${KF_PROTOBUF_TYPE}
 
-management:
-  server:
-    port: ${MANAGEMENT_PORT}
-
 app:
   mail:
     from: ${MAIL_FROM}

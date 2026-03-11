@@ -100,10 +100,6 @@ spring:
               predicates:
                 - Path=/api/v1/notifications/**
 
-management:
-  server:
-    port: ${MANAGEMENT_PORT}
-
 keycloak:
   admin:
     server-url: ${KC_INTERNAL_BASE_URL}

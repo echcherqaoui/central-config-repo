@@ -44,10 +44,6 @@ spring:
         spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
         specific.protobuf.value.type: ${KF_PROTOBUF_TYPE}
 
-management:
-  server:
-    port: ${MANAGEMENT_PORT}
-  
 resilience4j:
   circuitbreaker:
     circuit-breaker-aspect-order: 1
